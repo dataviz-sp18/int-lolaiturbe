@@ -1,0 +1,94 @@
+---
+title: "Interactive visualization"
+author: "Dolores De Iturbe"
+date: "05/22/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(gridExtra)
+library(plotly)
+
+```
+
+The data used for the visualizations presented bellow comes from the 2010 US Census at the Cook County level. This is the data that my partner and I will be using for our final project on racial segregation and income inequality in Chicago. I chose to do three plotly interactive visualizations where you can hover over the bars and see the corresponding percentages for each of the bars. I believe that the interactivity that these plotly graphs have, gives the reader to the ability to understand the underlying story of the graph. It is specifically useful when the reader wants to know the specific percentages for each group but you don’t want to have too much information on it. 
+
+The first plot is the percentage of households in Chicago that have an income above the median income for Chicago by race. The median income for Chicago is $55,251. From this graph we can see that Asians are the group that has the most amount of households with an income above the median with 60.12%. The second racial group with the highest percentage of households with an income above the median is whites with 57.92%. Later we have 40.84% Hispanics and finally 32.78% African Americans above the median income. This graph clearly reveals the income inequality by race in Chicago. 
+
+
+```{r}
+setwd("~/Dropbox")
+above_median_HH <- read.csv("above_median_per.csv")
+```
+
+
+```{r}
+above_median_HH$Race <- factor(above_median_HH$Race,
+                   levels = c('Asian', 'White', 'All', 'Hispanic', 'Other', 'Black'))
+
+p1 <- plot_ly(above_median_HH, x = ~Race, y = ~Percentage, type = 'bar',
+        marker = list(color = 'rgba(222,45,38,0.8)',
+                      line = list(color = I("black"),
+                                  width = 1.5))) %>%
+  layout(title = "Percentage of HH with income above the median by race in Chicago",
+         xaxis = list(title = "Race"),
+         yaxis = list(title = "Percentage of HH with income above the median"))
+p1
+```
+
+The second graph shows the race proportion by income bracket for those who have incomes above the median. This graph clearly portrays that as the income brackets increase, Whites and Asians earn more money while we see a decrease in the proportion of African Americans and Others. Whites start at 61.53% in the $50,000 to $59,000 income bracket and end at 84.02% of the $200,000 or more income bracket. In the other hand African Americans represent 22.69% in the $50,000 to $59,000 and decrease to only 5.63% at the $200,000 or more income bracket.
+
+
+```{r}
+setwd("~/Dropbox")
+tidy_income_race_pop <- read.csv("tidy_percent_pop_tot2.csv")
+
+```
+
+
+```{r message=FALSE, warning=FALSE}
+tidy_income_race_pop$Income <- factor(tidy_income_race_pop$Income,
+                   levels = c('$50,000 to $59,999', '$60,000 to $74,999', '$75,000 to $99,999', '$100,000 to $124,999', '$125,000 to $149,999', '$150,000 to $199,999', '$200,000 or more' ))
+
+ph <- plot_ly(tidy_income_race_pop, x = ~Percentage, y = ~Income, color = ~Race) %>%
+  layout(title = "Percentage of HH with income above the median by race in Chicago", xaxis = list(title = ''), yaxis = list(title = ''), barmode = 'stack', margin = list(l = 150, r = 0, t = 40, b = 5), legend = list(orientation = "h",   
+                     xanchor = "center",
+                     x = 0.5))
+ph
+```
+
+The third graph is just like the second one but this time it has ethnicity instead of race. Here we see that as income increases, the proportion of Hispanics, just as African Americans and Others in the second graph, decreases whereas the proportion of Whites that are not Hispanic increases. Hispanics represent 20.59% in the $50,000 to $59,000 income bracket and only 4.79% of the $200,000 or more income bracket. In the other hand Whites (not Hispanic) represent 49.81% of the $50,000 to $59,000 and increase to 80.32% at the $200,000 or more income bracket. It is important to mention here that the bars in this graph don’t add up to 100 because we do no see other races represented here (African American, Asian etc.). 
+
+```{r}
+setwd("~/Dropbox")
+tidy_income_hisp <- read.csv("tidy_percent_pop_tot2_Hisp.csv")
+```
+
+
+```{r message=FALSE, warning=FALSE}
+tidy_income_hisp$Income <- factor(tidy_income_hisp$Income,
+                   levels = c('$50,000 to $59,999', '$60,000 to $74,999', '$75,000 to $99,999', '$100,000 to $124,999', '$125,000 to $149,999', '$150,000 to $199,999', '$200,000 or more' ))
+
+ph <- plot_ly(tidy_income_hisp, x = ~Percentage, y = ~Income, color = ~Race) %>%
+  layout(title = "Percentage of HH with income above the median by ethnicity in Chicago", xaxis = list(title = ''), yaxis = list(title = ''), barmode = 'stack', margin = list(l = 150, r = 0, t = 40, b = 5), legend = list(orientation = "h",   
+                     xanchor = "center",
+                     x = 0.5))
+ph
+```
+
+
+According to Alberto Cairo’s framework of the five qualities of great visualizations established in *The Truthful Art: Data, charts, and maps for Communication* all graphs must be truthful, functional, esthetic, insightful and enlightening.  I will analyze the three plots I did based on this framework.
+
+1.	**Are they truthful?** The data used for this exercise was obtained from the US Census Bureau at tract level for Cook County. For all the tracts in Cook County I added up the information in order to have it at the county level. The US Census Bureau is well known to have good data collection and reporting methods. Given that the transmutations that were performed on the data were straight foreword the information shown in the graphs is truthful. I did not try to manipulate the way the graphs look in order to show a misinterpretation of the data. 
+
+2.	**Are they functional?** These animated visualizations are extremely functional. The three graphs show in a plain way the income gap between races and ethnicity. For the first graph the bars are organized in descending order so that we clearly see which race has the highest share of its population with an income above the median for Cook County. In the second and third graphs, the colors help identify easily the different races or ethnicities. From both graphs (2 & 3) it is easy to appreciate that whites or non-Hispanics comprise a larger share of the entire population and that as income increases, the share of all minorities (except for Asians) represent less and less. The interactivity is helpful in a sense that if you see the graph in a static way, it renders the desired information but if as a reader you want to know more details, you can hover and see the exact percentages for each group.
+3.	**Are they beautiful?** I do believe that the graphs that I created are aesthetically pleasing. They are all clear and concise without having extra features that are not needed to have an understanding of the graph. The titles, axis and legends of each graph do a good job a telling the whole story. For the second and third graphs I believe that the choice of colors is attractive and useful to see the differences between races and ethnicities. 
+
+4.	**Are they insightful?** In my opinion, these visualizations are very insightful, since they reveal the story that I am trying to tell very evidently. The general public can understand the graphs without any further explanations: income inequality in Cook County affects mostly African Americans and to a lesser extent Hispanics. 
+
+5.	**Are they enlightening?** Most people that have been to Chicago know that it is a very segregated city with many problems including income inequality. For this project I wanted to show the readers how income varies by race and ethnicity in the Chicagoland area. From the 3 graphs that I did, it is easy to understand that race and ethnicity play an important role in income inequality specifically for minorities except Asians who do better than any other race.
+
